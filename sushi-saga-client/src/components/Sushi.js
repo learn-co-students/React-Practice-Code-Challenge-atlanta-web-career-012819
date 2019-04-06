@@ -1,14 +1,16 @@
 import React, { Fragment } from "react";
 
 const Sushi = props => {
+  const {sushi} = props
+
   return (
     <div className="sushi">
-      <div className="plate" onClick={() => props.handleEat(props.id)}>
+      <div className="plate" onClick={() => props.handleEat(sushi)}>
         {/* Tell me if this sushi has been eaten! */}
-        {props.eaten ? null : <img src={props.img_url} width="100%" />}
+        {sushi.eaten ? null : <img src={sushi.img_url} width="100%" />}
       </div>
       <h4 className="sushi-details">
-        {props.name} - ${props.price}
+        {sushi.name} - ${sushi.price}
       </h4>
     </div>
   );

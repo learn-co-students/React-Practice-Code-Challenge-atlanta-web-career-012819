@@ -8,7 +8,9 @@ const API = "http://localhost:3000/sushis";
 class App extends Component {
   state = {
     sushis: [],
-    index: 0
+    eaten: [],
+    index: 0,
+    funds: 100
   };
 
   getSushis = () => {
@@ -23,14 +25,21 @@ class App extends Component {
       });
   };
 
-  handleEat = (id) => {
+  handleEat = (sushi) => {
     // console.log(id);
     // const sushi = this.state.sushis.find(sushi => sushi.id === id)
     // sushi.eaten = true
-    const sushis = this.state.sushis.map(sushi => {
-      return sushi.id === id ? { ...sushi, eaten: true} : sushi
-    })
-    this.setState({ sushis })
+    if (sushi.price <= this.state.funds && !sushi.eaten) {
+      const sushis = this.state.sushis.map(item => {
+        return sushi.id === item.id ? { ...item, eaten: true} : item
+      })
+
+      this.setState({
+        sushis,
+        eaten: [...this.state.eaten, sushi],
+        funds: this.state.funds - sushi.price
+       })
+    }
   };
 
   handleMore = () => {
@@ -49,7 +58,7 @@ class App extends Component {
           handleEat={this.handleEat}
           handleMore={this.handleMore}
         />
-        <Table />
+        <Table wallet={this.state.funds} eaten={this.state.eaten} />
       </div>
     );
   }
