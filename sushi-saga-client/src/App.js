@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import SushiContainer from "./containers/SushiContainer";
 import Table from "./containers/Table";
+import Wallet from "./components/Wallet";
 
 // Endpoint!
 const API = "http://localhost:3000/sushis";
@@ -14,21 +15,29 @@ class App extends Component {
   };
 
   getSushis = () => {
-    fetch(API)
+    return fetch(API)
       .then(response => response.json())
-      .then(sushis => {
-        const current = this.state.index;
-        this.setState({
-          sushis: sushis.slice(current, current + 4),
-          index: current + 4
-        });
-      });
+      .then(sushis => this.setState({sushis}))
   };
 
+  getCurrent = () => {
+    const sushis = this.state.sushis
+    const current = this.state.index;
+
+    return sushis.slice(current, current + 4)
+  }
+
+  getNext = () => {
+    let i = this.state.index;
+
+    i = i + 4 >= this.state.sushis.length ? 0 : i + 4
+
+    this.setState({
+      index: i
+    });
+  }
+
   handleEat = (sushi) => {
-    // console.log(id);
-    // const sushi = this.state.sushis.find(sushi => sushi.id === id)
-    // sushi.eaten = true
     if (sushi.price <= this.state.funds && !sushi.eaten) {
       const sushis = this.state.sushis.map(item => {
         return sushi.id === item.id ? { ...item, eaten: true} : item
@@ -43,18 +52,28 @@ class App extends Component {
   };
 
   handleMore = () => {
-    this.getSushis();
+    this.getNext();
   };
 
+  addFunds = e => {
+    e.preventDefault();
+    const amount = parseInt(e.target.amount.value, 10)
+
+    if (amount > 0) this.setState({funds: this.state.funds + amount})
+
+    e.target.reset()
+  }
+
   componentDidMount() {
-    this.getSushis();
+    this.getSushis()
   }
 
   render() {
     return (
       <div className="app">
+        <Wallet addFunds={this.addFunds} />
         <SushiContainer
-          sushis={this.state.sushis}
+          sushis={this.getCurrent()}
           handleEat={this.handleEat}
           handleMore={this.handleMore}
         />
